@@ -7,3 +7,12 @@ import sqlalchemy
 import pandas as pd
 import matplotlib.pyplot as plot
 import psycopg2
+
+inputOrSum = input("If you want to import data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program.")
+if inputOrSum == 1:
+    salesData = pd.read_excel("/Users/samjenson/Downloads/Retail_Sales_Data.xlsx")
+    
+elif inputOrSum == 2:
+    pass
+else:
+    pass
