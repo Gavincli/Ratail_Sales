@@ -7,11 +7,17 @@ import sqlalchemy
 import pandas as pd
 import matplotlib.pyplot as plot
 import psycopg2
+import openpyxl
 
-inputOrSum = input("If you want to import data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program.")
+inputOrSum = int(input("If you want to import data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program."))
 if inputOrSum == 1:
     salesData = pd.read_excel("/Users/samjenson/Downloads/Retail_Sales_Data.xlsx")
-    
+    seperatedNames = salesData['name'].str.split("_", expand = True)
+    salesData.insert(1, 'First Name', seperatedNames[0])
+    salesData.insert(2, 'Last Name', seperatedNames[1])
+    salesData.drop('name', axis=1, inplace=True)
+    salesData.to_excel('output.xlsx', index=False)
+    print("Export Successful")
 elif inputOrSum == 2:
     pass
 else:
