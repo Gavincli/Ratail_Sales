@@ -16,8 +16,6 @@ if inputOrSum == 1:
     salesData.insert(1, 'First Name', seperatedNames[0])
     salesData.insert(2, 'Last Name', seperatedNames[1])
     salesData.drop('name', axis=1, inplace=True)
-    salesData.to_excel('output.xlsx', index=False)
-    print("Export Successful")
 elif inputOrSum == 2:
     pass
 else:
