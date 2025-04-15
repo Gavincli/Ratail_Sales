@@ -43,7 +43,9 @@ database = 'is303'
 
 engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{database}')
 
-dfImportedFile.to_sql("sale", engine, if_exists='replace', index=False)
+conn = engine.connect()
+
+dfImportedFile.to_sql("sale", conn, if_exists='replace', index=False)
 
 
 # Step 5
