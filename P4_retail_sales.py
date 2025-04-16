@@ -50,3 +50,14 @@ dfImportedFile.to_sql("sale", conn, if_exists='replace', index=False)
 
 # Step 5
 print("You've imported the excel file into your postgres database.")
+
+
+category_df = df.query("category == @category")
+
+iTotalSales = category_df["total_price"].sum()
+iAverageSales = category_df["total_price"].mean()
+iUnitsSold = category_df["quantity_sold"].sum()
+
+print(f"Total sales for {category}: {iTotalSales}")
+print(f"Average sale amount for {category}: {iAverageSales}")
+print(f"Total units sold for {category}: {iUnitsSold}")
