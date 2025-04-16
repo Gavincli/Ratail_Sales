@@ -7,3 +7,12 @@ import sqlalchemy
 import pandas as pd
 import matplotlib.pyplot as plot
 import psycopg2
+
+
+product_sales.plot(kind='bar')
+
+plot.title(f"Total Sales by Product in {selected_category}")
+plot.xlabel("Product")
+plot.ylabel("Total Sales")
+plot.tight_layout()  # Neaten up spacing
+plot.show() 
