@@ -78,7 +78,7 @@ elif inputOrSum == 2:
     if choice_category.isdigit():
         selected_category = dictCategories[int(choice_category)]
 
-        # ✅ Correct query to filter by category
+        # Correct query to filter by category
         filter_query = text("SELECT * FROM sales WHERE category = :cat")
         df = pd.read_sql(filter_query, conn, params={"cat": selected_category})
 
