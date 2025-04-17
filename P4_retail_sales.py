@@ -11,7 +11,7 @@ import openpyxl
 
 # Step 4
 username = 'postgres'
-password = 'admin'
+password = 'whitehawk52'
 host = 'localhost'
 port = '5432'
 database = 'is303'
@@ -25,11 +25,13 @@ inputOrSum = int(input("If you want to import data, enter 1. If you want to see 
 if inputOrSum == 1:
 #     importing the original excel file
     salesData = pd.read_excel(r"C:\Users\gavin\Downloads\Retail_Sales_Data.xlsx")
+
 #     seperating our names into multiple columns
     seperatedNames = salesData['name'].str.split("_", expand = True)
     salesData.insert(1, 'First Name', seperatedNames[0])
     salesData.insert(2, 'Last Name', seperatedNames[1])
     salesData.drop('name', axis=1, inplace=True)
+
     # Step 3
     productCategoriesDict = {
         'Camera': 'Technology',
@@ -62,18 +64,24 @@ if inputOrSum == 1:
     print("You've imported the excel file into your postgres database.")
 
 elif inputOrSum == 2:
+
+    #part 2 step 1:
     print('The following are all the categories that have been sold:')
 
+    #defind df to use in part 2
     query = 'SELECT DISTINCT category FROM sales ORDER BY category;'
     dfCategories = pd.read_sql(text(query), conn)
 
+    #create dictionaries and assign numbers
     dictCategories = {}
     for iCount, category in enumerate(dfCategories['category'], start=1):
         dictCategories[iCount] = category
         print(f'{iCount}: {category}')
 
+    #get user input
     choice_category = input('Please enter the number of the category you want to see summarized: ')
 
+    #change choice to category
     if choice_category.isdigit():
         selected_category = dictCategories[int(choice_category)]
 
@@ -81,6 +89,7 @@ elif inputOrSum == 2:
         filter_query = text("SELECT * FROM sales WHERE category = :cat")
         df = pd.read_sql(filter_query, conn, params={"cat": selected_category})
 
+        #run the math, print the results
         iTotalSales = df["total_price"].sum()
         iAverageSales = df["total_price"].mean()
         iUnitsSold = df["quantity_sold"].sum()
@@ -91,6 +100,7 @@ elif inputOrSum == 2:
 
         dfProductSales = df.groupby('product')['total_price'].sum()
 
+        #create graph
         dfProductSales.plot(kind='bar')
         plot.title(f"Total sales in {selected_category}")
         plot.xlabel("Product")
@@ -98,4 +108,7 @@ elif inputOrSum == 2:
         plot.tight_layout()
         plot.show()
 
+#any other value: close the program
+else:
     print("Closing the program")
+    conn.close()
