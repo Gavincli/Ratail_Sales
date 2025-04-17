@@ -22,10 +22,9 @@ conn = engine.connect()
 
 # setting up our if statement to help us run the rest of the program
 inputOrSum = int(input("If you want to import data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program."))
-
 if inputOrSum == 1:
 #     importing the original excel file
-    salesData = pd.read_excel("/Users/thoma/Downloads/Retail_Sales_Data.xlsx")
+    salesData = pd.read_excel("/Users/samjenson/Downloads/Retail_Sales_Data.xlsx")
 #     seperating our names into multiple columns
     seperatedNames = salesData['name'].str.split("_", expand = True)
     salesData.insert(1, 'First Name', seperatedNames[0])
@@ -78,7 +77,7 @@ elif inputOrSum == 2:
     if choice_category.isdigit():
         selected_category = dictCategories[int(choice_category)]
 
-        # ✅ Correct query to filter by category
+        # Correct query to filter by category
         filter_query = text("SELECT * FROM sales WHERE category = :cat")
         df = pd.read_sql(filter_query, conn, params={"cat": selected_category})
 
