@@ -3,11 +3,22 @@
 # The retailer wants your team to test how they could transfer their data into a postgres database
 # and read data programmatically back from the database.
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import pandas as pd
 import matplotlib.pyplot as plot
 import psycopg2
 import openpyxl
+
+ # Step 4
+username = 'postgres'
+password = 'admin'
+host = 'localhost'
+port = '5433'
+database = 'is303'
+
+engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{database}')
+
+conn = engine.connect()
 
 # setting up our if statement to help us run the rest of the program
 inputOrSum = int(input("If you want to import data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program."))
@@ -41,72 +52,50 @@ if inputOrSum == 1:
         'Hat': 'Apparel',
         'Headphones': 'Technology',
         'Charger': 'Technology'}
-    df['category'] = df['product'].map(productCategoriesDict)
+    salesData['category'] = salesData['product'].map(productCategoriesDict)
 
+    salesData['total_price'] = salesData['quantity_sold'] * salesData['unit_price']
 
-    # Step 4
-    username = 'postgres'
-    password = 'admin'
-    host = 'localhost'
-    port = '5433'
-    database = 'is303'
-
-    engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{database}')
-
-    conn = engine.connect()
-
-    dfImportedFile.to_sql("sale", conn, if_exists='replace', index=False)
-
+    salesData.to_sql("sales", conn, if_exists='replace', index=False)
 
     # Step 5
     print("You've imported the excel file into your postgres database.")
 
 elif inputOrSum == 2:
-    category_df = df.query("category == @category")
+    print('The following are all the categories that have been sold:')
 
-    iTotalSales = category_df["total_price"].sum()
-    iAverageSales = category_df["total_price"].mean()
-    iUnitsSold = category_df["quantity_sold"].sum()
+    query = 'SELECT DISTINCT category FROM sales ORDER BY category;'
+    dfCategories = pd.read_sql(text(query), conn)
 
-    
-#Part 2 step 1
-#print instructions
-print('The following are all the categories that have been sold:')
+    dictCategories = {}
+    for iCount, category in enumerate(dfCategories['category'], start=1):
+        dictCategories[iCount] = category
+        print(f'{iCount}: {category}')
 
-#step 2
-#query for the distinct categories, print a numbered list
-query = 'SELECT DISTINCT category FROM sales ORDER BY category;'
-dfCategories = pd.read_sql( text(query), conn)
+    choice_category = input('Please enter the number of the category you want to see summarized: ')
 
-print('Read sql')
+    if choice_category.isdigit():
+        selected_category = dictCategories[int(choice_category)]
 
-#assign numbers and create dictionary
-dictCategories = {}
-for iCount, category in enumerate(dfCategories['category'], start = 1):
-    dictCategories[iCount] = category
-    print(f'{iCount}: {category}')
+        # Correct query to filter by category
+        filter_query = text("SELECT * FROM sales WHERE category = :cat")
+        df = pd.read_sql(filter_query, conn, params={"cat": selected_category})
 
-#step 3
-#receive input for which category to summarize
-choice_category = input('Please enter the number of the category you want to see summarized: ')
+        iTotalSales = df["total_price"].sum()
+        iAverageSales = df["total_price"].mean()
+        iUnitsSold = df["quantity_sold"].sum()
 
-if choice_category.isdigit():
-    category = dictCategories[choice_category]
+        print(f"Total sales for {selected_category}: {iTotalSales}")
+        print(f"Average sale amount for {selected_category}: {iAverageSales}")
+        print(f"Total units sold for {selected_category}: {iUnitsSold}")
 
+        dfProductSales = df.groupby('product')['total_price'].sum()
 
-category_df = df.query("category == @category")
+        dfProductSales.plot(kind='bar')
+        plot.title(f"Total sales in {selected_category}")
+        plot.xlabel("Product")
+        plot.ylabel("Total Sales")
+        plot.tight_layout()
+        plot.show()
 
-iTotalSales = category_df["total_price"].sum()
-iAverageSales = category_df["total_price"].mean()
-iUnitsSold = category_df["quantity_sold"].sum()
-
-print(f"Total sales for {category}: {iTotalSales}")
-print(f"Average sale amount for {category}: {iAverageSales}")
-print(f"Total units sold for {category}: {iUnitsSold}")
-
-
-    print(f"Total sales for {category}: {iTotalSales}")
-    print(f"Average sale amount for {category}: {iAverageSales}")
-    print(f"Total units sold for {category}: {iUnitsSold}")
-else:
     print("Closing the program")
