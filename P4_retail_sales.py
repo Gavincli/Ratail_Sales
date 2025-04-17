@@ -9,11 +9,11 @@ import matplotlib.pyplot as plot
 import psycopg2
 import openpyxl
 
- # Step 4
+# Step 4
 username = 'postgres'
 password = 'admin'
 host = 'localhost'
-port = '5433'
+port = '5432'
 database = 'is303'
 
 engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{database}')
@@ -24,7 +24,7 @@ conn = engine.connect()
 inputOrSum = int(input("If you want to import data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program."))
 if inputOrSum == 1:
 #     importing the original excel file
-    salesData = pd.read_excel("/Users/samjenson/Downloads/Retail_Sales_Data.xlsx")
+    salesData = pd.read_excel(r"C:\Users\gavin\Downloads\Retail_Sales_Data.xlsx")
 #     seperating our names into multiple columns
     seperatedNames = salesData['name'].str.split("_", expand = True)
     salesData.insert(1, 'First Name', seperatedNames[0])
