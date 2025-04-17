@@ -11,7 +11,7 @@ import openpyxl
 
 # Step 4
 username = 'postgres'
-password = 'whitehawk52'
+password = 'admin'
 host = 'localhost'
 port = '5432'
 database = 'is303'
